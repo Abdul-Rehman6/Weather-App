@@ -4,31 +4,32 @@ function fetchWeather(city) {
 
   setLoadingState(true);
 
-  fetch(apiUrl)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('No weather found.');
+  let xhr = new XMLHttpRequest();
+  xhr.open("GET", apiUrl, true);
+  xhr.onload = function () {
+      if (xhr.status >= 200 && xhr.status < 300) {
+          let data = JSON.parse(xhr.responseText);
+          displayWeather(data);
+      } else {
+          console.error('Error fetching weather:', xhr.statusText);
+          alert('No weather found. Please try again.');
       }
-      return response.json();
-    })
-    .then(data => {
-      displayWeather(data);
-    })
-    .catch(error => {
-      console.error('Error fetching weather:', error);
-      alert('No weather found. Please try again.');
-    })
-    .finally(() => {
       setLoadingState(false);
-    });
+  };
+  xhr.onerror = function () {
+      console.error('Error fetching weather:', xhr.statusText);
+      alert('No weather found. Please try again.');
+      setLoadingState(false);
+  };
+  xhr.send();
 }
 
 function setLoadingState(isLoading) {
   const weatherElement = document.querySelector(".weather");
   if (isLoading) {
-    weatherElement.classList.add("loading");
+      weatherElement.classList.add("loading");
   } else {
-    weatherElement.classList.remove("loading");
+      weatherElement.classList.remove("loading");
   }
 }
 
@@ -53,11 +54,10 @@ document.querySelector("#search-btn").addEventListener("click", function () {
 
 document.querySelector(".search-bar").addEventListener("keyup", function (event) {
   if (event.key === "Enter") {
-    const city = document.querySelector(".search-bar").value;
-    fetchWeather(city);
+      const city = document.querySelector(".search-bar").value;
+      fetchWeather(city);
   }
 });
-
 
 function fetchForecast(city) {
   const apiKey = "98aae6a121a8ade5f2176f7b4b71a150";
@@ -65,52 +65,53 @@ function fetchForecast(city) {
 
   setLoadingState(true);
 
-  fetch(forecastUrl)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('No forecast found.');
+  let xhr = new XMLHttpRequest();
+  xhr.open("GET", forecastUrl, true);
+  xhr.onload = function () {
+      if (xhr.status >= 200 && xhr.status < 300) {
+          let data = JSON.parse(xhr.responseText);
+          displayForecast(data);
+      } else {
+          console.error('Error fetching forecast:', xhr.statusText);
+          alert('No forecast found. Please try again.');
       }
-      return response.json();
-    })
-    .then(data => {
-      displayForecast(data);
-    })
-    .catch(error => {
-      console.error('Error fetching forecast:', error);
-      alert('No forecast found. Please try again.');
-    })
-    .finally(() => {
       setLoadingState(false);
-    });
+  };
+  xhr.onerror = function () {
+      console.error('Error fetching forecast:', xhr.statusText);
+      alert('No forecast found. Please try again.');
+      setLoadingState(false);
+  };
+  xhr.send();
 }
 
 function displayForecast(data) {
   const forecastElement = document.getElementById("forecast");
-  forecastElement.innerHTML = ""; 
+  forecastElement.innerHTML = "";
 
   for (let i = 0; i < data.list.length; i += 8) {
-    const forecastData = data.list[i];
-    const { dt_txt } = forecastData;
-    const { icon } = forecastData.weather[0];
-    const { temp } = forecastData.main;
+      const forecastData = data.list[i];
+      const { dt_txt } = forecastData;
+      const { icon } = forecastData.weather[0];
+      const { temp } = forecastData.main;
 
-    const forecastItem = document.createElement("div");
-    forecastItem.classList.add("forecast-item");
+      const forecastItem = document.createElement("div");
+      forecastItem.classList.add("forecast-item");
 
-    const dateElement = document.createElement("div");
-    dateElement.innerText = formatDate(dt_txt);
-    forecastItem.appendChild(dateElement);
+      const dateElement = document.createElement("div");
+      dateElement.innerText = formatDate(dt_txt);
+      forecastItem.appendChild(dateElement);
 
-    const iconElement = document.createElement("img");
-    iconElement.src = `https://openweathermap.org/img/wn/${icon}.png`;
-    iconElement.alt = "";
-    forecastItem.appendChild(iconElement);
+      const iconElement = document.createElement("img");
+      iconElement.src = `https://openweathermap.org/img/wn/${icon}.png`;
+      iconElement.alt = "";
+      forecastItem.appendChild(iconElement);
 
-    const tempElement = document.createElement("div");
-    tempElement.innerText = `${temp}°C`;
-    forecastItem.appendChild(tempElement);
+      const tempElement = document.createElement("div");
+      tempElement.innerText = `${temp}°C`;
+      forecastItem.appendChild(tempElement);
 
-    forecastElement.appendChild(forecastItem);
+      forecastElement.appendChild(forecastItem);
   }
 }
 
